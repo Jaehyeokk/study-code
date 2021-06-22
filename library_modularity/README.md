@@ -1,24 +1,7 @@
-# library_modularity
+# 외부 라이브러리 모듈화
 
-## Project setup
-```
-npm install
-```
+## 1. 컴포넌트화
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+## 2. 플러그인화
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## 3. 컴포넌트 통신을 이용한 기능 결합
