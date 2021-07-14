@@ -110,3 +110,94 @@ server.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
 });
 ```
+
+## Express
+
+### Express의 특징
+
+- Application
+  - Express instance를 application이라고 한다.
+  - Server에 필요한 기능인 middleware를 application에 추가한다.
+  - Routing 설정을 할 수 있다.
+  - Server를 요청 대기 상태로 만들 수 있다.
+
+```javascript
+const express = require("express");
+const app = express();
+
+app.listen(8080, function () {
+  console.log("Server is running");
+});
+```
+
+- Middleware
+  - middleware는 함수들의 연속이다.
+  - 일반 middleware와 에러 middleware가 있다.
+
+```javascript
+const express = require("express");
+// third party middleware
+const morgan = require("morgan");
+const app = express();
+
+// user-defined middleware
+function commonMw(req, res, next) {
+  console.log("commonMw");
+  next(new Error("error ouccered"));
+}
+
+// error middleware
+function ErrorMw(err, req, res, next) {
+  console.log(err.message);
+  // error를 처리하거나 다음 미들웨어에 넘김
+  next();
+}
+
+app.use(commonMw);
+app.use(ErrorMw);
+// 써드파티 미들웨어의 사용
+app.use(morgan("dev"));
+
+app.listen(3000, function () {
+  console.log("Server is running");
+});
+```
+
+- Routing
+
+  - 요청 url에 대해 적절한 핸들러 함수로 연결해주는 기능
+  - 어플리케이션의 get(), post() 메소드로 구현할 수 있다.
+  - Routing을 위한 전용 Router 클래스를 사용할 수도 있다.
+
+- 요청 객체
+
+  - 클라이언트 요청 정보를 담은 객체를 요청(Request)객체라고 한다.
+  - http 모듈의 request 객체를 래핑한 것이다.
+  - req.params(), req.query(), req.body() 메소드를 주로 사용한다.
+
+- 응답 객체
+- 클라이언트 응답 정보를 담은 객체를 응답(Response)객체라고 한다.
+- http 모듈의 response 객체를 래핑한 것이다.
+- res.send(), res.status(), res.json() 메소드를 주로 사용한다.
+
+## Express Hello World
+
+### Hello World 예제
+
+```javascript
+var express = require("express");
+var app = express();
+
+// routing
+app.get("/", function (req, res) {
+  res.send("Hello World!");
+});
+
+app.get("/users", function (req, res) {
+  res.send("User list");
+});
+
+app.listen(3000, function () {
+  console.log("Example app listening on port 3000!");
+});
+```
