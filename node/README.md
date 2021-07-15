@@ -201,3 +201,130 @@ app.listen(3000, function () {
   console.log("Example app listening on port 3000!");
 });
 ```
+
+## HTTP
+
+### HTTP 요청
+
+- 모든 자원은 명사로 식별한다
+- HTTP 경로로 자원을 요청한다
+- 예)
+  - GET /users
+  - GET /users/{id}
+
+### HTTP 메서드
+
+- 서버 자원에 대한 행동을 나타낸다. (동사로 표현)
+  - GET: 자원을 조회
+  - POST: 자원을 생성
+  - PUT: 자원을 갱신
+  - DELETE: 자원을 삭제
+- 익스프레스 어플리케이션의 메서드로 구현되어 있다.
+
+### HTTP 상태코드
+
+- 2XX: 자, 여기있어
+  - 200: 성공(success), GET, PUT
+  - 201: 작성됨(created), POST
+  - 204: 내용 없음 (No Conent), DELETE
+- 4XX: 니가 문제임
+  - 400: 잘못된 요청 (Bad Request)
+  - 401: 권한 없음 (Unauthorized)
+  - 404: 찾을 수 없음 (Not found)
+  - 409: 충돌 (Conflict)
+- 5XX: 내가 문제임
+  - 500: 서버 에러 (Interel server error)
+
+## TDD
+
+### TDD를 위한 라이브러리
+
+- Mocha
+
+  - 모카(Mocha)는 테스트 코드를 돌려주는 테스트 러너
+  - 테스트 수트: 테스트 환경으로 모카에서는 describe()로 구현한다.
+  - 테스트 케이스: 실제 테스트를 말하며 모카에서는 it()으로 구현한다.
+
+  ```javascript
+  // utils.js
+  function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  module.exports = {
+    capitalize,
+  };
+  ```
+
+  ```javascript
+  // utils.spec.js
+  const assert = require("assert");
+  const utils = require("./utils");
+
+  describe("utils.js 모듈의 capitalize() 함수는", () => {
+    it("문자열의 첫번째 문자를 변환한다", () => {
+      // ...
+      const result = utils.capitalize("hello");
+      assert.equal(result, "Hello");
+    });
+  });
+  ```
+
+  ```bash
+  # terminal
+  node_modules/.bin/mocha utils.spec.js
+  # test result
+  ```
+
+- Should
+
+  - Node assert 말고 서드파티 라이브러리를 사용하라
+  - should는 검증(assertion) 라이브러리다.
+  - 가독성 높은 테스트 코드를 만들 수 있다.
+
+  ```javascript
+  const should = require("should");
+  const utils = require("./utils");
+
+  describe("utils.js 모듈의 capitalize() 함수는", () => {
+    it("문자열의 첫번째 문자를 변환한다", () => {
+      // ...
+      const result = utils.capitalize("hello");
+      result.should.be.equal("Hello");
+    });
+  });
+  ```
+
+- SuperTest
+
+  - 단위 테스트: 함수의 기능 테스트
+  - 통합 테스트: API의 기능 테스트
+  - 슈퍼 테스트는 익스프레스 통합 테스트용 라이브러리다
+  - 내부적으로 익스프레스 서버를 구동시켜 실제 요청을 보낸 뒤 결과를 검증한다.
+
+  ```javascript
+  const request = require("supertest");
+  const app = require("./index");
+
+  describe("GET /users는", () => {
+    // 비동기처리를 위해 it함수의 두번째 파라미터로 done이라는 콜백을 받는다.
+    it("...", (done) => {
+      request(app)
+        .get("/users")
+        .end((err, res) => {
+          console.log(res.body);
+          // 끝나는 시점에 done을 호출
+          done();
+        });
+    });
+  });
+  ```
+
+```
+## TDD (Test driven development)로 만드는 API 서버
+
+```
+
+```
+
+```
