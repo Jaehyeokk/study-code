@@ -320,11 +320,78 @@ app.listen(3000, function () {
   });
   ```
 
-```
 ## TDD (Test driven development)로 만드는 API 서버
 
+### 사용자 목록 조회 API 요구사항
+
+- 성공
+  - 유저 객체를 담은 배열로 응답한다
+  - 최대 limit 갯수만큼 응답한다
+- 실패
+  - limit이 숫자형이 아니면 400을 응답한다
+  - offset이 숫자형이 아니면 400을 응답한다
+
+테스트 코드
+
+```javascript
+// index.js
+var express = require("express");
+var morgan = require("morgan");
+var app = express();
+var users = [
+  { id: 1, name: "alice" },
+  { id: 2, name: "bek" },
+  { id: 3, name: "chris" },
+];
+
+app.use(morgan("dev"));
+
+app.get("/users", function (req, res) {
+  req.query.limit = req.query.limit || 10; // req.qeury.limit이 없을 때 undefined 방지
+  const limit = parseInt(req.query.limit, 10); // 문자열로 오기 때문에 정수로 변환
+  if (Number.isNaN(limit)) {
+    return res.status(400).end();
+  }
+  res.json(users.slice(0, limit));
+});
+
+app.listen(3000, function () {
+  console.log("Server runnig at port 3000");
+});
+
+module.exports = app;
 ```
 
-```
+```javascript
+// index.spec.js
+const request = require("supertest");
+const should = require("should");
+const app = require("./index");
 
+describe("GET /users는", () => {
+  describe("성공시", () => {
+    it("유저 객체를 담은 배열로 응답한다.", (done) => {
+      request(app)
+        .get("/users")
+        .end((err, res) => {
+          res.body.should.be.instanceOf(Array);
+          done();
+        });
+    });
+    it("최대 limit 갯수만큼 응답한다", (done) => {
+      request(app)
+        .get("/users?limit=2")
+        .end((err, res) => {
+          res.body.should.have.lengthOf(2);
+          done();
+        });
+    });
+  });
+
+  describe("실패시", () => {
+    it("limit이 숫자형이 아니면 400을 응답한다", (done) => {
+      request(app).get("/users?limit=two").expect(400).end(done);
+    });
+  });
+});
 ```
