@@ -331,8 +331,6 @@ app.listen(3000, function () {
   - limit이 숫자형이 아니면 400을 응답한다
   - offset이 숫자형이 아니면 400을 응답한다
 
-테스트 코드
-
 ```javascript
 // index.js
 var express = require("express");
@@ -391,6 +389,54 @@ describe("GET /users는", () => {
   describe("실패시", () => {
     it("limit이 숫자형이 아니면 400을 응답한다", (done) => {
       request(app).get("/users?limit=two").expect(400).end(done);
+    });
+  });
+});
+```
+
+### 사용자 조회 API 요구사항
+
+- 성공
+  - id가 1인 유저 객체를 반환한다.
+- 실패
+  - id가 숫자가 아닐경우 400으로 응답한다.
+  - id로 유저를 찾을 수 없을 경우 404로 응답한다.
+
+```javascript
+// index.js
+// ...
+
+app.get("/users/:id", function (req, res) {
+  const id = parseInt(req.params.id, 10);
+  if (Number.isNaN(id)) return res.status(400).end();
+  const user = users.filter((user) => user.id === id)[0];
+  if (!user) return res.status(404).end();
+  res.json(user);
+});
+```
+
+```javascript
+// index.spec.js
+// ...
+
+describe("GET /users/1은", () => {
+  describe("성공시", () => {
+    it("id가 1인 유저 객체를 반환한다.", (done) => {
+      request(app)
+        .get("/users/1")
+        .end((err, res) => {
+          console.log(res.body);
+          res.body.should.have.property("id", 1);
+          done();
+        });
+    });
+  });
+  describe("실패시", () => {
+    it("id가 숫자가 아닐경우 400을 응답한다.", (done) => {
+      request(app).get("/users/one").expect(400).end(done);
+    });
+    it("id로 유저를 찾을 수 없을 경우 404를 응답한다.", (done) => {
+      request(app).get("/users/999").expect(404).end(done);
     });
   });
 });
