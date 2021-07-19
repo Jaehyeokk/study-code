@@ -441,3 +441,40 @@ describe("GET /users/1은", () => {
   });
 });
 ```
+
+### 사용자 삭제 API 요구사항
+
+- 성공
+  - 204를 응답한다.
+- 실패
+  - id가 숫자가 아닐경우 400으로 응답한다.
+
+```javascript
+// index.js
+// ...
+
+app.delete("/users/:id", function (req, res) {
+  const id = parseInt(req.params.id, 10);
+  if (Number.isNaN(id)) return res.status(400).end();
+  users = users.filter((user) => user.id !== id);
+  res.status(204).end();
+});
+```
+
+```javascript
+// index.spec.js
+// ...
+
+describe("GET /users/1은", () => {
+  describe("성공시", () => {
+    it("204를 응답한다", (done) => {
+      request(app).delete("/users/1").expect(204).end(done);
+    });
+  });
+  describe("실패시", () => {
+    it("id가 숫자가 아닐 경우 400으로 응답한다.", (done) => {
+      request(app).delete("/users/one").expect(400).end(done);
+    });
+  });
+});
+```
