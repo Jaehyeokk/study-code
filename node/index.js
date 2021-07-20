@@ -1,4 +1,5 @@
 var express = require("express");
+var bodyParser = require("body-parser");
 var morgan = require("morgan");
 var app = express();
 var users = [
@@ -7,8 +8,11 @@ var users = [
   { id: 3, name: "chris" },
 ];
 
+app.use(express.json()); // for parsing application/json
+app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use(morgan("dev"));
 
+// Get User-list
 app.get("/users", function (req, res) {
   req.query.limit = req.query.limit || 10;
   const limit = parseInt(req.query.limit, 10);
@@ -18,6 +22,7 @@ app.get("/users", function (req, res) {
   res.json(users.slice(0, limit));
 });
 
+// Get User
 app.get("/users/:id", function (req, res) {
   const id = parseInt(req.params.id, 10);
   if (Number.isNaN(id)) return res.status(400).end();
@@ -26,11 +31,24 @@ app.get("/users/:id", function (req, res) {
   res.json(user);
 });
 
+// Delete User
 app.delete("/users/:id", function (req, res) {
   const id = parseInt(req.params.id, 10);
   if (Number.isNaN(id)) return res.status(400).end();
   users = users.filter((user) => user.id !== id);
   res.status(204).end();
+});
+
+// Create User
+app.post("/users", function (req, res) {
+  const name = req.body.name;
+  if (!name) return res.status(400).end();
+  const isConflict = users.filter((user) => user.name === name).length;
+  if (isConflict) return res.status(409).end();
+  const id = Date.now();
+  const user = { id, name };
+  users.push(user);
+  res.status(201).json(user);
 });
 
 app.listen(3000, function () {

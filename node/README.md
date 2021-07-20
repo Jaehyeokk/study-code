@@ -478,3 +478,70 @@ describe("GET /users/1은", () => {
   });
 });
 ```
+
+### 사용자 추가 API 요구사항
+
+- 성공
+  - 201 상태코드를 반환한다.
+  - 생성된 유저 객체를 반환한다.
+  - 입력한 name을 반환한다.
+- 실패
+  - name 파라미터 누락시 400을 반환한다.
+  - name이 중복일 경우 409를 반환한다.
+
+```javascript
+// index.js
+// ...
+
+app.post("/users", function (req, res) {
+  const name = req.body.name;
+  if (!name) return res.status(400).end();
+  const isConflict = users.filter((user) => user.name === name).length;
+  if (isConflict) return res.status(409).end();
+  const id = Date.now();
+  const user = { id, name };
+  users.push(user);
+  res.status(201).json(user);
+});
+```
+
+```javascript
+// index.spec.js
+// ...
+
+describe("POST /users", () => {
+  describe("성공시", () => {
+    let name = "daniel",
+      body;
+    // mocha 함수 testcase가 동작하기 전에 미리 동작하는 함수
+    before((done) => {
+      request(app)
+        .post("/users")
+        .send({ name })
+        .expect(201)
+        .end((err, res) => {
+          body = res.body;
+          done();
+        });
+    });
+    it("생성된 유저 객체를 반환한다", () => {
+      body.should.have.property("id");
+    });
+    it("입력한 name을 반환한다", () => {
+      body.should.have.property("name", name);
+    });
+  });
+  describe("실패시", () => {
+    it("name 파라미터 누락시 400을 반환한다", (done) => {
+      request(app).post("/users").send({}).expect(400).end(done);
+    });
+    it("name이 중복일 경우 409를 반환한다", (done) => {
+      request(app)
+        .post("/users")
+        .send({ name: "daniel" })
+        .expect(409)
+        .end(done);
+    });
+  });
+});
+```
