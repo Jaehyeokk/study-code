@@ -1,13 +1,15 @@
 var express = require("express");
-var bodyParser = require("body-parser");
 var morgan = require("morgan");
 var app = express();
+
+// DB
 var users = [
   { id: 1, name: "alice" },
   { id: 2, name: "bek" },
   { id: 3, name: "chris" },
 ];
 
+// Middleware
 app.use(express.json()); // for parsing application/json
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use(morgan("dev"));
@@ -39,7 +41,7 @@ app.delete("/users/:id", function (req, res) {
   res.status(204).end();
 });
 
-// Create User
+// Post User
 app.post("/users", function (req, res) {
   const name = req.body.name;
   if (!name) return res.status(400).end();
@@ -51,6 +53,23 @@ app.post("/users", function (req, res) {
   res.status(201).json(user);
 });
 
+// Put User
+app.put("/users/:id", (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (Number.isNaN(id)) return res.status(400).end();
+
+  const name = req.body.name;
+  if (!name) return res.status(400).end();
+  const isConflict = users.filter((user) => user.name === name).length;
+  if (isConflict) return res.status(409).end();
+
+  const user = users.filter((user) => user.id === id)[0];
+  if (!user) return res.status(404).end();
+  user.name = name;
+  res.json(user);
+});
+
+// Server
 app.listen(3000, function () {
   console.log("Server runnig at port 3000");
 });

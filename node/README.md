@@ -545,3 +545,71 @@ describe("POST /users", () => {
   });
 });
 ```
+
+### 사용자 수정 API 요구사항
+
+- 성공
+  - 변경된 name을 반환한다.
+- 실패
+  - 정수가 아닌 id일 경우 400을 응답한다.
+  - name이 없을 경우 400을 응답한다.
+  - 없는 유저일 경우 404를 응답한다.
+  - 이름이 중복일 경우 409를 응답한다.
+
+```javascript
+// index.js
+// ...
+
+app.put("/users/:id", (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (Number.isNaN(id)) return res.status(400).end();
+
+  const name = req.body.name;
+  if (!name) return res.status(400).end();
+  const isConflict = users.filter((user) => user.name === name).length;
+  if (isConflict) return res.status(409).end();
+
+  const user = users.filter((user) => user.id === id)[0];
+  if (!user) return res.status(404).end();
+  user.name = name;
+  res.json(user);
+});
+```
+
+```javascript
+// index.spec.js
+// ...
+
+describe("PUT /users/:id는", () => {
+  describe("성공시", () => {
+    it("변경된 name을 응답한다.", (done) => {
+      const name = "chally";
+      request(app)
+        .put("/users/3")
+        .send({ name })
+        .end((req, res) => {
+          res.body.should.have.property("name", name);
+          done();
+        });
+    });
+  });
+  describe("실패시", () => {
+    it("정수가 아닌 id일 경우 400을 응답한다", (done) => {
+      request(app).put("/users/one").expect(400).end(done);
+    });
+    it("name이 없을 경우 400을 응답한다", (done) => {
+      request(app).put("/users/one").send({}).expect(400).end(done);
+    });
+    it("없는 유저일 경우 404를 응답한다", (done) => {
+      request(app)
+        .put("/users/999")
+        .send({ name: "foo" })
+        .expect(404)
+        .end(done);
+    });
+    it("이름이 중복일 경우 경우 409를 응답한다", (done) => {
+      request(app).put("/users/3").send({ name: "bek" }).expect(409).end(done);
+    });
+  });
+});
+```
