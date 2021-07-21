@@ -613,3 +613,90 @@ describe("PUT /users/:id는", () => {
   });
 });
 ```
+
+### 리팩토링 - Router class
+
+Route 부분을 express의 Router class를 이용해서 리팩토링
+
+```js
+// /index.js
+
+// user 모듈을 가져온다.
+var user = require("./api/user");
+
+// /users 경로로 들어오는 라우팅은 user모듈로 처리한다.
+app.use("/users", user); //
+```
+
+```js
+// /api/user/index.js
+
+// express를 가져와서 라우터 클래스를 생성한다.
+const express = require("express");
+const router = express.Router();
+
+var users = [
+  { id: 1, name: "alice" },
+  { id: 2, name: "bek" },
+  { id: 3, name: "chris" },
+];
+
+// 생성한 router class로 라우팅을 작성한다.
+
+// Get User-list
+router.get("/", function (req, res) {
+  req.query.limit = req.query.limit || 10;
+  const limit = parseInt(req.query.limit, 10);
+  if (Number.isNaN(limit)) {
+    return res.status(400).end();
+  }
+  res.json(users.slice(0, limit));
+});
+
+// Get User
+router.get("/:id", function (req, res) {
+  const id = parseInt(req.params.id, 10);
+  if (Number.isNaN(id)) return res.status(400).end();
+  const user = users.filter((user) => user.id === id)[0];
+  if (!user) return res.status(404).end();
+  res.json(user);
+});
+
+// Delete User
+router.delete("/:id", function (req, res) {
+  const id = parseInt(req.params.id, 10);
+  if (Number.isNaN(id)) return res.status(400).end();
+  users = users.filter((user) => user.id !== id);
+  res.status(204).end();
+});
+
+// Post User
+router.post("/", function (req, res) {
+  const name = req.body.name;
+  if (!name) return res.status(400).end();
+  const isConflict = users.filter((user) => user.name === name).length;
+  if (isConflict) return res.status(409).end();
+  const id = Date.now();
+  const user = { id, name };
+  users.push(user);
+  res.status(201).json(user);
+});
+
+// Put User
+router.put("/:id", (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (Number.isNaN(id)) return res.status(400).end();
+
+  const name = req.body.name;
+  if (!name) return res.status(400).end();
+  const isConflict = users.filter((user) => user.name === name).length;
+  if (isConflict) return res.status(409).end();
+
+  const user = users.filter((user) => user.id === id)[0];
+  if (!user) return res.status(404).end();
+  user.name = name;
+  res.json(user);
+});
+
+module.exports = router;
+```
