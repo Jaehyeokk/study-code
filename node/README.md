@@ -1073,3 +1073,67 @@ delete from users where id = 1;
 - 모델의 사용
   - sequelize.define(): 모델 정의
   - sequelize.sync(): 데이터베이스 연동
+
+### Sync Database
+
+1. Sequelize, sqlite3 설치
+
+```bash
+# Terminal
+
+npm i sequelize sqlite3 --save
+```
+
+2. Sequelize 설정
+
+```js
+// models.js
+
+const { Sequelize, DataTypes } = require("sequelize");
+const sequelize = new Sequelize({
+  dialect: "sqlite",
+  storage: "./db.sqlite",
+});
+
+// define()으로 모델을 정의
+const user = sequelize.define("User", {
+  name: {
+    type: DataTypes.STRING,
+  },
+});
+
+module.exports = {
+  Sequelize,
+  sequelize,
+  user,
+};
+```
+
+3. Sync
+
+```js
+// bin/sync-db.js
+
+const models = require("../models");
+
+module.exports = () => {
+  // sync()로 연결
+  return models.sequelize.sync({ force: true });
+};
+```
+
+```js
+// bin/www.js
+
+const app = require("../index");
+const syncDb = require("./sync-db");
+
+// module.exports는 promise를 반환하기 때문에 then()으로 이을 수 있다.
+syncDb().then(() => {
+  console.log("Sync database");
+  // Server
+  app.listen(3000, function () {
+    console.log("Server runnig at port 3000");
+  });
+});
+```
