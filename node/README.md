@@ -950,3 +950,70 @@ describe("PUT /users/:id는", () => {
     "start": "node index.js"
   },
 ```
+
+### 리팩토링 - Test code 2
+
+테스트시 서버 로그 안남도록 환경변수 설정
+
+```json
+// package.json
+
+"scripts": {
+    // mac
+    "test": "NODE_ENV=test mocha api/user/user.spec.js",
+    // windows - (npm i cross-env) 라이브러리를 이용해야 한다.
+    "test": "cross-env NODE_ENV=test mocha api/user/user.spec.js",
+  },
+```
+
+```js
+// /index.js
+
+// 환경변수를 설정하면 process.env라는 내장 객체에 저장된다.
+if (process.env.NODE_ENV !== "test") {
+  app.use(morgan("dev"));
+}
+```
+
+테스트시 supertest와 중복으로 서버가 실행되지 않도록 서버실행 코드 분리
+
+```js
+// /index.js
+
+var express = require("express");
+var morgan = require("morgan");
+var user = require("./api/user");
+var app = express();
+
+// Middleware
+app.use(express.json()); // for parsing application/json
+app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+
+if (process.env.NODE_ENV !== "test") {
+  app.use(morgan("dev"));
+}
+
+app.use("/users", user);
+
+module.exports = app;
+```
+
+```js
+// bin/www.js
+
+const app = require("../index");
+
+// Server
+app.listen(3000, function () {
+  console.log("Server runnig at port 3000");
+});
+```
+
+```json
+// package.json
+
+ "scripts": {
+    "test": "cross-env NODE_ENV=test mocha api/user/user.spec.js",
+    "start": "node bin/www.js"
+  },
+```
