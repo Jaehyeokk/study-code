@@ -1017,3 +1017,59 @@ app.listen(3000, function () {
     "start": "node bin/www.js"
   },
 ```
+
+## DB
+
+### DB의 종류
+
+- SQL DB
+
+  - MySQL, PostgreSQL, Aurora, Sqlite
+
+- NoSQL DB
+
+  - MongoDB, DynamoDB
+
+- In Memory DB
+  - Redis, Memcashed
+
+### Query
+
+```sql
+-- ex)
+insert table ('name') value ('alice');
+select * from users;
+update users set name = 'bek' where id = 1;
+delete from users where id = 1;
+```
+
+### ORM
+
+- 데이터베이스를 객체로 추상화해 놓은 것을 ORM(Object Relational Mapping)이라고 한다.
+
+- 쿼리를 직접 작성하는 대신 ORM의 메서드로 데이터를 관리할 수 있는 장점이 있다.
+
+- Node에서 SQL ORM은 시퀄라이져(Sequelize)가 있다.
+
+### Sequelize Query
+
+```sql
+-- ex) query
+--    -> sequelize
+insert table ('name') value ('alice');
+-> User.create({name: 'alice'});
+select * from users;
+-> User.findAll();
+update users set name = 'bek' where id = 1;
+-> User.update({name: 'bek'}, {where: {id: 1}});
+delete from users where id = 1;
+-> User.destroy({where: {id: 1}});
+
+```
+
+### Sequelize Model
+
+- 데이터베이스 테이블을 ORM으로 추상화한것을 모델이라고 한다.
+- 모델의 사용
+  - sequelize.define(): 모델 정의
+  - sequelize.sync(): 데이터베이스 연동

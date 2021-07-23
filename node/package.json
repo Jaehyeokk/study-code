@@ -12,7 +12,9 @@
   "license": "ISC",
   "dependencies": {
     "cross-env": "^7.0.3",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "sequelize": "^6.6.5",
+    "sqlite3": "^5.0.2"
   },
   "devDependencies": {
     "mocha": "^9.0.2",
