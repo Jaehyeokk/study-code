@@ -1,8 +1,16 @@
 const request = require("supertest");
 const should = require("should");
 const app = require("../../");
+const models = require("../../models");
 
 describe("GET /users는", () => {
+  const users = [{ name: "alice" }, { name: "bek" }, { name: "chris" }];
+  before(() => {
+    return models.sequelize.sync({ force: true });
+  });
+  before(() => {
+    return models.user.bulkCreate(users);
+  });
   describe("성공시", () => {
     it("유저 객체를 담은 배열로 응답한다.", (done) => {
       request(app)
@@ -30,6 +38,13 @@ describe("GET /users는", () => {
 });
 
 describe("GET /users/:id는", () => {
+  const users = [{ name: "alice" }, { name: "bek" }, { name: "chris" }];
+  before(() => {
+    return models.sequelize.sync({ force: true });
+  });
+  before(() => {
+    return models.user.bulkCreate(users);
+  });
   describe("성공시", () => {
     it("id가 1인 유저 객체를 반환한다.", (done) => {
       request(app)
@@ -52,6 +67,13 @@ describe("GET /users/:id는", () => {
 });
 
 describe("DELETE /users/:id는", () => {
+  const users = [{ name: "alice" }, { name: "bek" }, { name: "chris" }];
+  before(() => {
+    return models.sequelize.sync({ force: true });
+  });
+  before(() => {
+    return models.user.bulkCreate(users);
+  });
   describe("성공시", () => {
     it("204를 응답한다", (done) => {
       request(app).delete("/users/1").expect(204).end(done);
@@ -65,6 +87,13 @@ describe("DELETE /users/:id는", () => {
 });
 
 describe("POST /users는", () => {
+  const users = [{ name: "alice" }, { name: "bek" }, { name: "chris" }];
+  before(() => {
+    return models.sequelize.sync({ force: true });
+  });
+  before(() => {
+    return models.user.bulkCreate(users);
+  });
   describe("성공시", () => {
     // mocha 함수 testcase가 동작하기 전에 미리 동작하는 함수
     let name = "daniel",
@@ -101,6 +130,13 @@ describe("POST /users는", () => {
 });
 
 describe("PUT /users/:id는", () => {
+  const users = [{ name: "alice" }, { name: "bek" }, { name: "chris" }];
+  before(() => {
+    return models.sequelize.sync({ force: true });
+  });
+  before(() => {
+    return models.user.bulkCreate(users);
+  });
   describe("성공시", () => {
     it("변경된 name을 응답한다.", (done) => {
       const name = "chally";

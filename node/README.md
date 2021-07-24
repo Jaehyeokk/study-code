@@ -1137,3 +1137,148 @@ syncDb().then(() => {
   });
 });
 ```
+
+### 컨트롤러에 적용
+
+- models를 가져와서 각 api에 맞게 사용한다.
+
+```js
+const models = require("../../models");
+
+const index = function (req, res) {
+  req.query.limit = req.query.limit || 10;
+  const limit = parseInt(req.query.limit, 10);
+  if (Number.isNaN(limit)) {
+    return res.status(400).end();
+  }
+  models.user
+    .findAll({
+      limit: limit,
+    })
+    .then((users) => {
+      res.json(users);
+    });
+};
+
+const show = function (req, res) {
+  const id = parseInt(req.params.id, 10);
+  if (Number.isNaN(id)) return res.status(400).end();
+  models.user
+    .findOne({
+      where: {
+        id,
+      },
+    })
+    .then((user) => {
+      if (!user) return res.status(404).end();
+      res.json(user);
+    });
+};
+
+const destroy = function (req, res) {
+  const id = parseInt(req.params.id, 10);
+  if (Number.isNaN(id)) return res.status(400).end();
+  models.user
+    .destroy({
+      where: { id },
+    })
+    .then(() => {
+      res.status(204).end();
+    });
+};
+
+const create = function (req, res) {
+  const name = req.body.name;
+  if (!name) return res.status(400).end();
+
+  models.user
+    .create({ name })
+    .then((user) => {
+      res.status(201).json(user);
+    })
+    .catch((err) => {
+      if (err.name === "SequelizeUniqueConstraintError") {
+        return res.status(409).end();
+      }
+      res.status(500).end();
+    });
+};
+
+const update = function (req, res) {
+  const id = parseInt(req.params.id, 10);
+  if (Number.isNaN(id)) return res.status(400).end();
+
+  const name = req.body.name;
+  if (!name) return res.status(400).end();
+
+  models.user.findOne({ where: { id } }).then((user) => {
+    if (!user) return res.status(404).end();
+
+    user.name = name;
+    user
+      .save()
+      .then((user) => {
+        res.json(user);
+      })
+      .catch((err) => {
+        if (err.name === "SequelizeUniqueConstraintError") {
+          return res.status(409).end();
+        }
+        res.status(500).end();
+      });
+  });
+};
+
+module.exports = {
+  index,
+  show,
+  destroy,
+  create,
+  update,
+};
+```
+
+### 테스트 코드에 적용
+
+- sync()로 db와 연결, bulkCreate()로 테스트용 데이터를 생성하는 코드를 각 test describe에 넣어준다.
+
+```js
+const request = require("supertest");
+const should = require("should");
+const app = require("../../");
+const models = require("../../models");
+
+describe("GET /users는", () => {
+  const users = [{ name: "alice" }, { name: "bek" }, { name: "chris" }];
+  before(() => {
+    return models.sequelize.sync({ force: true });
+  });
+  before(() => {
+    return models.user.bulkCreate(users);
+  });
+  describe("성공시", () => {
+    it("유저 객체를 담은 배열로 응답한다.", (done) => {
+      request(app)
+        .get("/users")
+        .end((err, res) => {
+          res.body.should.be.instanceOf(Array);
+          done();
+        });
+    });
+    it("최대 limit 갯수만큼 응답한다", (done) => {
+      request(app)
+        .get("/users?limit=2")
+        .end((err, res) => {
+          res.body.should.have.lengthOf(2);
+          done();
+        });
+    });
+  });
+
+  describe("실패시", () => {
+    it("limit이 숫자형이 아니면 400을 응답한다", (done) => {
+      request(app).get("/users?limit=two").expect(400).end(done);
+    });
+  });
+});
+```

@@ -2,11 +2,13 @@ const { Sequelize, DataTypes } = require("sequelize");
 const sequelize = new Sequelize({
   dialect: "sqlite",
   storage: "./db.sqlite",
+  logging: false,
 });
 
 const user = sequelize.define("User", {
   name: {
     type: DataTypes.STRING,
+    unique: true,
   },
 });
 
