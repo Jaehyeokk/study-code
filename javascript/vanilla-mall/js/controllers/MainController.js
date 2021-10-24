@@ -1,7 +1,9 @@
 import FormView from '../Views/FormView.js'
 import TabView from '../Views/TabView.js'
+import KeywordView from '../views/KeywordView.js'
 import ResultView from '../Views/ResultView.js'
 import SearchModel from '../models/SearchModel.js'
+import KeywordModel from '../models/KeywordModel.js'
 
 const tag = '[MainController]'
 
@@ -14,21 +16,37 @@ export default {
     TabView.setup(document.querySelector('#tabs'))
       .on('@change', e => this.onChangeTab(e.detail.tabName))
 
+    KeywordView.setup(document.querySelector('#search-keyword'))
+      .on('@click', e => this.onClickKeyword(e.detail.keyword))
     ResultView.setup(document.querySelector('#search-result'))
 
     this.selectedTab = '추천 검색어'
-    this.runderView()
+    this.renderView()
     
   },
 
-  runderView() {
+  renderView() {
     console.log(tag, '[renderView]')
     TabView.setActiveTab(this.selectedTab)
+
+    if (this.selectedTab === '추천 검색어') {
+      this.fetchSearchKeyword()
+    } else {
+      debugger
+    }
+
     ResultView.hide()
+  },
+
+  fetchSearchKeyword() {
+    KeywordModel.list().then(data => {
+      KeywordView.render(data)
+    })
   },
 
   search(query) {
     console.log(tag, 'search()', query);
+    FormView.setValue(query)
     // search API
     SearchModel.list(query).then(data => {
       this.onSearchResult(data)
@@ -42,14 +60,20 @@ export default {
 
   onResetForm() {
     console.log(tag, 'onResetForm()');
-    ResultView.hide()
+    this.renderView();
   },
 
   onSearchResult(data) {
+    TabView.hide()
+    KeywordView.hide()
     ResultView.render(data)
   },
 
   onChangeTab(tabName) {
     debugger
+  },
+
+  onClickKeyword(keyword) {
+    this.search(keyword)
   }
 }
