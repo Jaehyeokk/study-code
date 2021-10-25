@@ -1,9 +1,11 @@
 import FormView from '../Views/FormView.js'
 import TabView from '../Views/TabView.js'
 import KeywordView from '../views/KeywordView.js'
+import HistoryView from '../views/HistoryView.js'
 import ResultView from '../Views/ResultView.js'
 import SearchModel from '../models/SearchModel.js'
 import KeywordModel from '../models/KeywordModel.js'
+import HistoryModel from '../models/HistoryModel.js'
 
 const tag = '[MainController]'
 
@@ -18,6 +20,11 @@ export default {
 
     KeywordView.setup(document.querySelector('#search-keyword'))
       .on('@click', e => this.onClickKeyword(e.detail.keyword))
+
+    HistoryView.setup(document.querySelector('#search-history'))
+      .on('@click', e => this.onClickHistory(e.detail.keyword))
+      .on('@remove', e => this.onRemoveHistory(e.detail.keyword))
+
     ResultView.setup(document.querySelector('#search-result'))
 
     this.selectedTab = '추천 검색어'
@@ -31,8 +38,10 @@ export default {
 
     if (this.selectedTab === '추천 검색어') {
       this.fetchSearchKeyword()
+      HistoryView.hide()
     } else {
-      debugger
+      this.fetchSearchHistory()
+      KeywordView.hide()
     }
 
     ResultView.hide()
@@ -44,9 +53,16 @@ export default {
     })
   },
 
+  fetchSearchHistory() {
+    HistoryModel.list().then(data => {
+      HistoryView.render(data).bindRemoveBtn()
+    })
+  },
+
   search(query) {
     console.log(tag, 'search()', query);
     FormView.setValue(query)
+    HistoryModel.add(query)
     // search API
     SearchModel.list(query).then(data => {
       this.onSearchResult(data)
@@ -70,10 +86,20 @@ export default {
   },
 
   onChangeTab(tabName) {
-    debugger
+    this.selectedTab = tabName
+    this.renderView()
   },
 
   onClickKeyword(keyword) {
     this.search(keyword)
+  },
+
+  onClickHistory(keyword) {
+    this.search(keyword)
+  },
+
+  onRemoveHistory(keyword) {
+    HistoryModel.remove(keyword)
+    this.renderView()
   }
 }
