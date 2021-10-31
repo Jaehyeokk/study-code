@@ -17,49 +17,19 @@
       <!-- form -->
       <search-form :value="query" @@submit="onSubmit" @@reset="onReset"></search-form>
       <div v-if="submited">
-        <div v-if="searchResult.length">
-          <ul>
-            <li v-for="item in searchResult">
-              <img :src="item.image" alt=""> {{ item.name }}
-            </li>
-          </ul> 
-        </div>
-        <div v-else>
-          {{ query }} 검색어로 찾을 수 없습니다.
-        </div>
+        <!-- result -->
+        <search-result :data="searchResult" :query="query"></search-result>
       </div>
       <div v-else>
-        <ul class="tabs">
-          <li v-for="tab in tabs" :class="{ active: tab === selectedTab }" @click="onClickTab(tab)">
-            {{ tab }}
-          </li>
-        </ul>
+        <!-- tabs -->
+        <tabs :tabs="tabs" :selected-tab="selectedTab" @@change="onClickTab"></tabs>
         <div v-if="selectedTab === tabs[0]">
-          <div v-if="keywords.length">
-            <ul class="list">
-              <li v-for="(item, index) in keywords" @click="onClickKeyword(item.keyword)">
-                <span class="number">{{ index + 1 }}</span>
-                {{ item.keyword }}
-              </li>
-            </ul>
-          </div>
-          <div v-else>
-            추천 검색어가 없습니다.
-          </div>
+          <!-- recommended search list -->
+          <list :data="keywords" type="keywords" @@click="onClickKeyword"></list>
         </div>
         <div v-else>
-          <div v-if="history.length">
-            <ul class="list">
-              <li v-for="(item, index) in history" @click="onClickKeyword(item.keyword)">
-                {{ item.keyword }}
-                <span class="date">{{ item.date }}</span>
-                <button class="btn-remove" @click.stop="onClickRemoveHistory(item.keyword)"></button>
-              </li>
-            </ul>
-          </div>
-          <div v-else>
-            최근 검색어가 없습니다.
-          </div>
+          <!-- recent search list -->
+          <list :data="history" type="history" @@click="onClickKeyword" @@remove="onClickRemoveHistory"></list>
         </div>
       </div>
     </div>
@@ -74,4 +44,41 @@
     <input type="text" v-model="inputValue" @keyup="onKeyup" placeholder="검색어를 입력하세요" autofocus>
     <button v-show="inputValue.length" @click="onReset" type="reset" class="btn-reset"></button>
   </form>
+</template>
+
+<template id="search-result">
+  <div v-if="data.length">
+    <ul>
+      <li v-for="item in data">
+        <img :src="item.image" alt=""> {{ item.name }}
+      </li>
+    </ul> 
+  </div>
+  <div v-else>
+    {{ query }} 검색어로 찾을 수 없습니다.
+  </div>
+</template>
+
+<template id="list">
+  <div v-if="data.length">
+    <ul class="list">
+      <li v-for="(item, index) in data" @click="onClickList(item.keyword)">
+        <span v-if="keywordType" class="number">{{ index + 1 }}</span>
+        {{ item.keyword }}
+        <span v-if="historyType" class="date">{{ item.date }}</span>
+        <button v-if="historyType" class="btn-remove" @click.stop="onRemoveList(item.keyword)"></button>
+      </li>
+    </ul>
+  </div>
+  <div v-else>
+    추천 검색어가 없습니다.
+  </div>
+</template>
+
+<template id="tabs">
+  <ul class="tabs">
+    <li v-for="tab in tabs" :class="{ active: tab === selectedTab }" @click="onClickTab(tab)">
+      {{ tab }}
+    </li>
+  </ul>
 </template>

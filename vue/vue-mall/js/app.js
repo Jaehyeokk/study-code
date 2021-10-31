@@ -3,11 +3,17 @@ import KeywordsModel from './models/KeywordModel.js'
 import HistoryModel from './models/HistoryModel.js'
 
 import FormComponent from './components/FormComponent.js'
+import ResultComponent from './components/ResultComponent.js'
+import ListComponent from './components/ListComponent.js'
+import TabComponent from './components/TabComponent.js'
 
 new Vue({
   el: '#app',
   components: {
-    'search-form': FormComponent
+    'search-form': FormComponent,
+    'search-result': ResultComponent,
+    'list': ListComponent,
+    'tabs': TabComponent,
   },
   data() {
     return {
@@ -26,16 +32,14 @@ new Vue({
     this.fetchHistory()
   },
   methods: {
-    onSubmit(e) {
+    onSubmit(val) {
+      this.query = val
       this.search()
     },
     onReset() {
       this.query = ''
       this.submited = false
       this.searchResult = []
-    },
-    onKeyup() {
-      if(!this.query.length) this.onReset()
     },
     onClickTab(tab) {
       this.selectedTab = tab
