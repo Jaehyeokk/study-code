@@ -1,5 +1,7 @@
 <template>
-  <Tutorial/>
+  <div>
+    <h1>Init Project</h1>
+  </div>
 </template>
 
 <script>
