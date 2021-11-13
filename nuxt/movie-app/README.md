@@ -18,16 +18,16 @@
 
   - 공식 홈페이지는 Yarn을 더 선호하는 느낌이다. 
   ```bash
-  yarn create nuxt-app <project-name>
+  $ yarn create nuxt-app <project-name>
   ```
 
   - npx는 npm 버전이 v5.2이상일 경우 기본으로 제공된다고 한다. 
   ```bash
-  npx create-nuxt-app <project-name>
+  $ npx create-nuxt-app <project-name>
   ```
 
   ```bash
-  npm init nuxt-app <project-name>
+  $ npm init nuxt-app <project-name>
   ```
 
 ## 프로젝트 초기화
@@ -39,7 +39,7 @@
 - fiber를 설치하면 동기식 컴파일이 자동으로 활성화 된다고 한다.
 
 ```bash
-yarn add --dev sass sass-loader@10 fibers
+$ yarn add --dev sass sass-loader@10 fibers
 ```
 
 - 전역으로 사용할 css파일을 지정해준다.
@@ -126,4 +126,37 @@ export default {
   <script>
   export default {}
   </script>
-  ```  
+  ```
+
+## 환경변수 관리
+
+- API를 적용하기 앞서 API_KEY 등을 환경변수로 관리할 필요가 있기에 분리한다.
+
+- `nuxt`에서 이미 `dotenv`모듈을 제공하고 있기 때문에 설치한다.
+
+  ```bash
+  $ yarn add @nuxtjs/dotenv
+  ```
+
+- 설치한 모듈은 nuxt.config.js 파일에서 buildModules에 등록한다.
+
+  ```js 
+  // nuxt.config.js
+  export default {
+    buildModules: ['@nuxtjs/dotenv']
+  }
+  ```
+
+- 환경변수는 관리하기 쉽도록 env.jsv파일에 객체 형식으로 정리한다.
+
+  ```js
+  // env.js
+  export const MOVIEDB = {
+    BASE_URL: process.env.MOVIEDB_URL,
+    API_KEY: process.env.MOVIEDB_KEY
+  }
+  ``` 
+
+
+
+  
