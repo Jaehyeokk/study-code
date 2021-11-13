@@ -1,3 +1,5 @@
+const isDev = process.env.NODE_ENV !== 'production'
+
 module.exports = {
   root: true,
   env: {
@@ -17,7 +19,6 @@ module.exports = {
   ],
   // add your custom rules here
   rules: {
-    // 'no-console': 0 
-    //  isDev ? 0 : 1
+    'no-console': isDev
   }
 }

@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <h1>Init Project</h1>
+  <div class="home">
+    <Hero />
   </div>
 </template>
 
