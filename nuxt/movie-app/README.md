@@ -157,6 +157,24 @@ export default {
   }
   ``` 
 
+## API 적용
 
+### API는 themoviedb.org에서 제공받아 사용합니다.
+
+- themoviedb.org 에서 회원가입 후 API KEY를 제공받 을 수 있다.
+
+- developers.themoviedb.org/3 에서 API 관련 문서를 확인할 수 있다.
+
+- API가 잘 받아와지는지 확인한다.
+
+  ```js
+  // pages/index.vue
+  methods: {
+    async getMovies() {
+      const { data } = await axios.get(`${MOVIEDB.BASE_URL}/3/movie/now_playing?api_key=${MOVIEDB.API_KEY}&language=en-US&page=1`)
+      console.log(data);
+    }
+  }
+  ```
 
   
