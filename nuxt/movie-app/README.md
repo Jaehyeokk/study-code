@@ -159,22 +159,39 @@ export default {
 
 ## API 적용
 
-### API는 themoviedb.org에서 제공받아 사용합니다.
+### API는 themoviedb.org에서 제공받아 사용한다.
 
 - themoviedb.org 에서 회원가입 후 API KEY를 제공받 을 수 있다.
 
 - developers.themoviedb.org/3 에서 API 관련 문서를 확인할 수 있다.
 
-- API가 잘 받아와지는지 확인한다.
+- API로 필요한 데이터를 받아서 data에 저장하는 method를 만들고 fetch hook을 사용해 data에 담는다.
 
   ```js
   // pages/index.vue
+  async fetch() {
+    await this.getMovies()
+  },
   methods: {
     async getMovies() {
       const { data } = await axios.get(`${MOVIEDB.BASE_URL}/3/movie/now_playing?api_key=${MOVIEDB.API_KEY}&language=en-US&page=1`)
-      console.log(data);
+      data.results.forEach(movie => {
+        this.movies.push(movie)
+      })
     }
   }
   ```
 
-  
+### fetch(), asyncData() hook
+
+- nuxt.js에서 데이터를 호출하기 위해 사용하는 훅이 2가지 있다.
+
+- `fetch()`와 `asyncData()`이다.
+
+- `fetch()`는 페이지가 랜더링되기 전에 데이터를 스토어에 넣기위해서 사용한다.
+
+- `fetch()`는 컴포넌트를 로드하기 전에 호출된다.
+
+- `fetch()`는 모든 컴포넌트에서 사용할 수 있다.
+
+- `fetch()`는 컨텍스트 객체를 첫번째 인수로 받으며, 그 데이터를 스토어에 넣을 수 있다.
