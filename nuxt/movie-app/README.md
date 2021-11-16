@@ -208,4 +208,20 @@ export default {
 
   - `.lazy` option을 주게 되면 change 이벤트 이후에 데이터를 동기화 한다.
 
-  
+## 로딩 컴포넌트 구현
+
+- 로딩 컴포넌트를 생성하고 등록한다.
+
+  ```html
+  <Loading v-if="$fetchState.pending" />
+  ```
+
+- Nuxt에서 제공하는 `$fetchState`속성을 이용한다.
+
+  - `$fetchState`속성은 fetch상태정보를 가져올 수 있다.
+
+  - `$fetchState.pending`은 Boolean 값으로 client-side 에서 fetch hook이 호출되었을때 placeholder를 표시하도록 해줍니다.
+
+  - `$fetchState.error`는 null 또는 fetch hook이 반환한 Error이다.
+
+  - `$fetchState.timestamp`timestamp는 최신 fetch의 timestamp로써, keep-alive으로 caching 하는 것에 유용하다.
