@@ -224,4 +224,8 @@ export default {
 
   - `$fetchState.error`는 null 또는 fetch hook이 반환한 Error이다.
 
-  - `$fetchState.timestamp`timestamp는 최신 fetch의 timestamp로써, keep-alive으로 caching 하는 것에 유용하다.
+  - `$fetchState.timestamp`는 최신 fetch의 timestamp로써, keep-alive으로 caching 하는 것에 유용하다.
+
+## 데이터 캐싱 (keep-alive directive)
+
+- `keep alive` directive를 사용해 컴포넌트를 캐싱할 수 있다.
