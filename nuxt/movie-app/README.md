@@ -229,3 +229,7 @@ export default {
 ## 데이터 캐싱 (keep-alive directive)
 
 - `keep alive` directive를 사용해 컴포넌트를 캐싱할 수 있다.
+
+## 무비 상세페이지 구현
+
+## 검색엔진 최적화(SEO optimization)

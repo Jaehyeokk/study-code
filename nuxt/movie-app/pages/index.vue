@@ -81,7 +81,6 @@ export default {
     }
   },
   async fetch() {
-    console.log(this.$fetchState);
     if (this.searchInput === '') {
       await this.getMovies()
       return
