@@ -52,13 +52,18 @@ export default {
   name: 'SingleMovie',
   data() {
     return {
-      movie: null,
+      movie: '',
     }
   },
   async fetch() {
     await this.getSingleMovie()
   },
   fetchDelay: 1000,
+  head() {
+    return {
+      title: this.movie.title,
+    }
+  },
   methods: {
     async getSingleMovie() {
       const { data } = await axios.get(`${MOVIEDB.BASE_URL}/3/movie/${this.$route.params.movieid}?api_key=${MOVIEDB.API_KEY}&language=en-US`)

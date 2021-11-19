@@ -233,3 +233,65 @@ export default {
 ## 무비 상세페이지 구현
 
 ## 검색엔진 최적화(SEO optimization)
+
+- `nuxt.config.js`에 등록하는 방법으로 `<meta>`정보의 전역 설정을 할 수 있다.
+  ```js
+  export default {
+    head: {
+      title: 'my website title',
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        {
+          hid: 'description',
+          name: 'description',
+          content: 'my website description'
+        }
+      ],
+      link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]
+    }
+  }
+  ```
+
+- 각 페이지 `<script>`안에 `head`속성을 등록하는 방법으로 `<meta>`정보의 지역 설정을 할 수 있다.
+  ```js
+  <script>
+    export default {
+      head: {
+        title: 'Home page',
+        meta: [
+          {
+            hid: 'description',
+            name: 'description',
+            content: 'Home page description'
+          }
+        ],
+      }
+    }
+  </script>
+  ```
+
+- 객체로 등록하는 방법이 아닌 함수로 등록하면 data, computed속성에 접근할 수 있다.
+  ```js
+  <script>
+    export default {
+      data() {
+        return {
+          title: 'Home page'
+        }
+      },
+      head() {
+        return {
+          title: this.title,
+          meta: [
+            {
+              hid: 'description',
+              name: 'description',
+              content: 'Home page description'
+            }
+          ]
+        }
+      }
+    }
+  </script>
+  ```
